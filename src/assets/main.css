@@ -22,7 +22,7 @@ body {
   cursor: pointer;
   position: absolute;
   height: 330px;
-  bottom: 76px;
+  bottom: 50px;
   right: 0px;
 }
 
@@ -30,7 +30,7 @@ body {
   cursor: pointer;
   position: absolute;
   height: 280px;
-  bottom: 95px;
+  bottom:70px;
   right: 350px;
 }
 
@@ -38,15 +38,15 @@ body {
   cursor: pointer;
   position: absolute;
   height: 300px;
-  bottom: 95px;
-  right: 590px;
+  bottom: 70px;
+  right: 610px;
 }
 
 .korpus4{
   cursor: pointer;
   position: absolute;
   height: 320px;
-  top: 20px;
+  top: -40px;
   left: 430px;
 }
 
@@ -54,7 +54,7 @@ body {
   cursor: pointer;
   position: absolute;
   height: 330px;
-  top: 80px;
+  top: -20px;
   left: 200px;
 }
 

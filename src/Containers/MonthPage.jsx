@@ -11,22 +11,22 @@ import { List } from "@mui/material";
 import { ListItem } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Modal from "@mui/material/Modal";
-
+import getFacultyColor from "../assets/getFacultyColor";
 import BottomNavigation from "@mui/material/BottomNavigation";
 import axios from 'axios';
 
 const weekDaysNames = ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"];
 
-const getFacultyColor = {
-  FCAD: "#674788",
-  FITC: "#2A6195",
-  TUC: "#4E9CA7",
-  FCSN: "#478836",
-  FRE: "#E0C42F",
-  FEE: "#EB7C3E",
-  FIS: "#E85454",
-  MF: "#65574F",
-};
+// const getFacultyColor = {
+//   FCAD: "#674788",
+//   FITC: "#2A6195",
+//   TUC: "#4E9CA7",
+//   FCSN: "#478836",
+//   FRE: "#E0C42F",
+//   FEE: "#EB7C3E",
+//   FIS: "#E85454",
+//   MF: "#65574F",
+// };
 
 function facultyName(item){
 
@@ -58,17 +58,6 @@ function facultyName(item){
     }
 
 }
-
-
-const data = {
-  name: "мероприятие 1",
-  date: "15.09.2024",
-  time: "15.00",
-  duration: "4",
-  university_building: "1",
-  description: "длинное описание",
-  faculty: "ФКП",
-};
 
 function MonthPage() {
   const [month, setMonth] = useState(new Date().getMonth() + 1);
@@ -352,7 +341,7 @@ function MonthPage() {
                   width: "100%",
                   bgcolor: "#FFFFFF",
                   borderRadius: "10px",
-                  minHeight: "20px",
+                  height: "146px",
 
                   overflow: "hidden",
                   maxHeight: "146px",
@@ -525,7 +514,7 @@ function MonthPage() {
                   width: "100%",
                   display: "flex",
                   justifyContent: "flex-start",
-                  backgroundColor: "yellow",
+                  backgroundColor: getFacultyColor[value.faculty],
                   height: "auto",
                   borderRadius: "20px",
                   p: "15px",

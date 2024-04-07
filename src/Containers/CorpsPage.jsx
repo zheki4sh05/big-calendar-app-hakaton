@@ -16,7 +16,7 @@ import axios from "axios";
 import CloseIcon from "@mui/icons-material/Close";
 import Slide from "@mui/material/Slide";
 import { forwardRef, useEffect, useState } from "react";
-
+import getFacultyColor from "../assets/getFacultyColor";
 import Modal from "@mui/material/Modal";
 
 import { Button } from "@mui/material";
@@ -184,9 +184,9 @@ function CorpsPage() {
               >
                 <CloseIcon />
               </IconButton>
-              <Box>
+              <Box sx={{display:"flex",justifyContent:"flex-end", width:"100%"}}>
                 <Typography
-                  sx={{ ml: 2, flex: 1 }}
+                  sx={{ ml: 2, flex: 1,textAlign:"right" }}
                   variant="h6"
                   component="div"
                 >
@@ -196,7 +196,7 @@ function CorpsPage() {
             </Toolbar>
           </AppBar>
           <Box
-            sx={{ p: { xs: 2, md: 5 }, display: "flex", flexDirection: "row" }}
+            sx={{ p: { xs: 2, md: 5 }, display: "flex", flexDirection: {md:"row",xs:"column"} }}
           >
             <Box
               sx={{
@@ -245,13 +245,16 @@ function CorpsPage() {
                 alignItems: "flex-start",
                 height: "100%",
                 overflow: "hidden",
+                width:"100%",
+                ml:{md:"30vw"},
+               
                 m: 0,
                 p: 0,
               }}
             >
               <Box>
                 <img
-                  style={{ width: "200px", height: "200px" }}
+                  style={{ width: "500px", height: "500px" }}
                   src={corpsImages.find((obj) => obj.id === activeCorps).elem}
                 />
               </Box>
@@ -277,7 +280,7 @@ function CorpsPage() {
                   width: "100%",
                   display: "flex",
                   justifyContent: "flex-start",
-                  backgroundColor: "yellow",
+                  backgroundColor: getFacultyColor[popUpdata.faculty],
                   height: "auto",
                   borderRadius: "20px",
                   p: "15px",
@@ -323,9 +326,11 @@ function CorpsPage() {
                       borderRadius: "20px",
                       p: "14px",
                       boxSizing: "border-box",
+                      maxHeight:"420px",
+                      overflowY:"scroll"
                     }}
                   >
-                    <Typography variant="body2">
+                    <Typography variant="body2" sx={{ maxHeight:"420px"}}>
                       {popUpdata.description}
                     </Typography>
                   </Box>
