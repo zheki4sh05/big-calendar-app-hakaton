@@ -71,10 +71,10 @@ const menu_items = [
     path: PathConstants.MONTH,
     icon: <CalendarMonthIcon fontSize="large" sx={{color:"white", fontSize:{xs:"25px"}}}/>,
   },
-  {
-    path: PathConstants.FACULTIES,
-    icon: <SchoolIcon fontSize="large" sx={{color:"white",fontSize:{xs:"25px"}}}/>,
-  },
+  // {
+  //   path: PathConstants.FACULTIES,
+  //   icon: <SchoolIcon fontSize="large" sx={{color:"white",fontSize:{xs:"25px"}}}/>,
+  // },
   {
     path: PathConstants.CORPS,
     icon: <DomainIcon fontSize="large" sx={{color:"white",fontSize:{xs:"25px"}}}/>,

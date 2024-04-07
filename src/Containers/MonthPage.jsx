@@ -13,19 +13,52 @@ import CloseIcon from "@mui/icons-material/Close";
 import Modal from "@mui/material/Modal";
 
 import BottomNavigation from "@mui/material/BottomNavigation";
+import axios from 'axios';
 
 const weekDaysNames = ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"];
 
 const getFacultyColor = {
-  ФКП: "#674788",
-  ФИТУ: "#2A6195",
-  ПРОФКОМ: "#4E9CA7",
-  ФКСИС: "#478836",
-  ФРЭ: "#E0C42F",
-  ИЭФ: "#EB7C3E",
-  ФИБ: "#E85454",
-  ВФ: "#65574F",
+  FCAD: "#674788",
+  FITC: "#2A6195",
+  TUC: "#4E9CA7",
+  FCSN: "#478836",
+  FRE: "#E0C42F",
+  FEE: "#EB7C3E",
+  FIS: "#E85454",
+  MF: "#65574F",
 };
+
+function facultyName(item){
+
+    switch(item){
+      case 'FCAD':{
+        return "ФКП"
+      }
+      case 'FITC':{
+        return "ФИТУ"
+      }
+      case 'TUC':{
+        return "ПРОФКОМ"
+      }
+      case 'FCSN':{
+        return "ФКСИС"
+      }
+      case 'FRE':{
+        return "ФРЭ"
+      }
+      case 'FEE':{
+        return "ИЭФ"
+      }
+      case 'FIS':{
+        return "ФИБ"
+      }
+      case 'MF':{
+        return "ВФ"
+      }
+    }
+
+}
+
 
 const data = {
   name: "мероприятие 1",
@@ -41,10 +74,8 @@ function MonthPage() {
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
   const [days, setDays] = useState([]);
-  const [processedData, setData] = useState([data]); //добавить сортировку полученных данных с сервера
-  const [value, setValue] = useState(0);
-
-  const [modalData, setModalData] = useState({});
+  const [processedData, setData] = useState(new Map()); 
+  const [value, setValue] = useState({});
 
   const [open, setOpen] = useState(false);
 
@@ -59,12 +90,30 @@ function MonthPage() {
     return date === new Date().getDate() && month===new Date().getMonth()+1 && year === new Date().getFullYear() ? "#00BFFF" : "none";
   }
 
-  async function makeRequest() {
+  function getMapOfEvents(param){
+    const mapByDate = param.reduce((map, obj) => {
+      const { date, description,faculty, name, time, university_building, url  } = obj;
+      if (!map.has(parseInt(date.split('-')[2]))) {
+        map.set(parseInt(date.split('-')[2]), [obj]); // Создаем новый массив для данного date
+      } else {
+        map.get(parseInt(date.split('-')[2])).push(obj); // Добавляем объект в существующий массив
+      }
+      return map;
+    }, new Map());
+    
+    // Пример использования
+   return mapByDate;
+  }
+
+  async function makeRequest(number) {
     try {
-      const response = await axios.get(
-        "http://localhost:8080/api/v1/auth/register"
-      );
-      //  setData({})
+     
+      const response = await axios.get("http://127.0.0.1:8000/"+number);
+    
+    
+       setData(getMapOfEvents(response.data))
+ 
+
     } catch (error) {
       console.log("error", error);
     }
@@ -76,7 +125,6 @@ function MonthPage() {
     transform: "translate(-50%, -50%)",
     width: { md: "654px", sm: "550px", xs: "90%" },
     bgcolor: "white",
-    border: "none",
     borderRadius: "20px",
     boxShadow: 24,
     pt: 1,
@@ -90,6 +138,9 @@ function MonthPage() {
     const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
     setDays(daysArray);
   }, [month, year]);
+
+
+
 
   const monthNames = [
     "Январь",
@@ -114,6 +165,7 @@ function MonthPage() {
         return prevMonth - 1;
       }
     });
+   
   };
   const increaseMonth = () => {
     setMonth((prevMonth) => {
@@ -124,15 +176,32 @@ function MonthPage() {
         return prevMonth + 1;
       }
     });
+
+   
+
   };
+
+  useEffect(() => {
+    if (month) {
+        setMonth(month);
+        makeRequest(month)
+    }
+  }, [month])
+
 
   const handleToday = () => {
     setMonth(new Date().getMonth() + 1);
     setYear(new Date().getFullYear());
   };
 
+  useEffect(() => {
+    if (value) {
+      setValue(value)
+    }
+  }, [value])
   const handleClickOnCalendarEvent = (data) => {
-    console.log(data);
+    setValue(data)
+
     handleOpen();
   };
 
@@ -274,7 +343,7 @@ function MonthPage() {
         }}
       >
         <Grid container spacing={0.3}>
-          {days.map((item, index) => (
+          {days.map((day, index) => (
             <Grid key={index} item xs={1.709999}>
               <Box
                 sx={{
@@ -306,12 +375,12 @@ function MonthPage() {
                       display:"flex",
                       alignItems:"center",
                       justifyContent:"center",
-                      backgroundColor: checkCurrentDate(item),
+                      backgroundColor: checkCurrentDate(day),
                       zIndex: "100",
                     }}
                   >
                     <Typography variant="button" display="block">
-                      <strong>{item}</strong>
+                      <strong>{day}</strong>
                     </Typography>
                   </Box>
                 </Box>
@@ -325,65 +394,78 @@ function MonthPage() {
                     mt: "-6px",
                   }}
                 >
-                  {[0, 1, 2].map((item, index) => (
-                    <ListItem
-                      key={index}
-                      sx={{
-                        mt: "-10px",
-                        "&:hover": {
-                          cursor: "pointer",
-                        },
-                      }}
-                      onClick={(event) => {
-                        handleClickOnCalendarEvent(item);
-                      }}
-                    >
-                      <Grid container spacing={1}>
-                        <Grid item xs={8}>
-                          <Box
-                            sx={{
-                              width: "100%",
-                              height: "auto",
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              bgcolor: getFacultyColor.ФКП,
-                              borderRadius: "8px",
-                              padding: "3px",
-                            }}
-                          >
-                            <Typography
-                              variant="subtitle1"
-                              sx={{ color: "white" }}
+
+                  {
+                    processedData.has(parseInt(day)) ? 
+                 
+                          processedData.get(day).map((item, index) => (
+                            <ListItem
+                              key={index}
+                              sx={{
+                                mt: "-10px",
+                                "&:hover": {
+                                  cursor: "pointer",
+                                },
+                              }}
+                              onClick={(event) => {
+                                handleClickOnCalendarEvent(item);
+                              }}
                             >
-                              {item}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Box
-                            sx={{
-                              width: "100%",
-                              height: "auto",
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              bgcolor: getFacultyColor.ФКП,
-                              borderRadius: "8px",
-                              padding: "3px",
-                            }}
-                          >
-                            <Typography
-                              variant="subtitle1"
-                              sx={{ color: "white" }}
-                            >
-                              {item}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </ListItem>
-                  ))}
+                              <Grid container spacing={1}>
+                                <Grid item xs={8}>
+                                  <Box
+                                    sx={{
+                                      width: "100%",
+                                      height: "auto",
+                                      display: "flex",
+                                      justifyContent: "center",
+                                      alignItems: "center",
+                                      bgcolor: getFacultyColor[item.faculty],
+                                      borderRadius: "8px",
+                                      padding: "3px",
+                                    }}
+                                  >
+                                    <Typography
+                                      variant="subtitle1"
+                                      sx={{ color: "white" }}
+                                    >
+                                      {item.name}
+                                    </Typography>
+                                  </Box>
+                                </Grid>
+                                <Grid item xs={4}>
+                                  <Box
+                                    sx={{
+                                      width: "100%",
+                                      height: "auto",
+                                      display: "flex",
+                                      justifyContent: "center",
+                                      alignItems: "center",
+                                      bgcolor: getFacultyColor[item.faculty],
+                                      borderRadius: "8px",
+                                      padding: "3px",
+                                    }}
+                                  >
+                                    <Typography
+                                      variant="subtitle1"
+                                      sx={{ color: "white" }}
+                                    >
+                                 
+                                      {
+                                        item.time.substring(0, item.time.length - 3)
+                                      }
+                                    </Typography>
+                                  </Box>
+                                </Grid>
+                              </Grid>
+                            </ListItem>
+                          ))
+                          :
+                          null
+
+                        
+                  }
+              
                 </List>
               </Box>
             </Grid>
@@ -427,7 +509,7 @@ function MonthPage() {
                   }}
                 ></Box>
                 <Box sx={{}}>
-                  <Typography variant="subtitle2">{item}</Typography>
+                  <Typography variant="subtitle2">{facultyName(item)}</Typography>
                 </Box>
               </Box>
             ))}
@@ -451,7 +533,7 @@ function MonthPage() {
                 }}
               >
                 <Typography variant="h4" sx={{ color: "white" }}>
-                  <strong>Хакатон</strong>
+                  <strong>{value.name}</strong>
                 </Typography>
               </Box>
             </Grid>
@@ -492,10 +574,7 @@ function MonthPage() {
                     }}
                   >
                     <Typography variant="body2">
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Officiis possimus magnam vel illum quod. Quo et iusto
-                      recusandae natus, quibusdam excepturi officiis mollitia
-                      quia doloremque suscipit pariatur commodi autem. Nostrum!
+                      {value.description}
                     </Typography>
                   </Box>
                 </Grid>
@@ -512,18 +591,45 @@ function MonthPage() {
                         backgroundColor: "#EAEBEA",
                         borderRadius: "10px",
                         marginBottom: "9px",
+                        display:"flex",
+                        justifyContent:"center"
                       }}
                     >
-                      <Typography variant="body2">5-8 апреля</Typography>
+                      <Typography variant="body2">{value.date}</Typography>
                     </Box>
                     <Box
                       sx={{
                         p: "6px",
                         backgroundColor: "#EAEBEA",
                         borderRadius: "10px",
+                        marginBottom: "9px",
+                        display:"flex",
+                        justifyContent:"center"
                       }}
                     >
-                      <Typography variant="body2">5-8 апреля</Typography>
+                      <Typography variant="body2">{value.time}</Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        p: "6px",
+                        backgroundColor: "#EAEBEA", 
+                        borderRadius: "10px",
+                        marginBottom: "9px",
+                       
+                      }}
+                    >
+                      <Typography variant="body2">Корпус: {value.university_building}</Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        p: "6px",
+                        backgroundColor: "#EAEBEA", 
+                        borderRadius: "10px",
+                        overflow:"hidden",
+               
+                      }}
+                    >
+                      <Typography variant="body2">Ссылки: {<br/>} <a  href={value.url} > {value.url}</a></Typography>
                     </Box>
                   </Box>
                 </Grid>
